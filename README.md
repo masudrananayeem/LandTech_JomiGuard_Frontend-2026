@@ -74,3 +74,43 @@ No government API is connected. Never upload real NID, deed scans or personal da
 
 ## License
 Prototype code: MIT. Dataset and third-party document samples remain under their respective licences/terms.
+
+## UI expansion update (2026-10-16)
+
+The client workspace now has a responsive sidebar and these views:
+
+- **Overview** — hero, workspace snapshot, feature shortcuts and safety callout.
+- **Land analyzer** — searchable/filterable synthetic scenarios, transparent findings, comparison table and print-to-PDF.
+- **Document desk** — upload validation UI and clearly labelled OCR pipeline stages (OCR itself is not implemented here).
+- **Ownership timeline** — illustrative historical event timeline with record-gap explanations.
+- **Plot explorer** — schematic, explicitly non-cadastral plot layout and property details.
+- **Buyer checklist** — ten interactive due-diligence checklist items and print support.
+- **Activity & field guide** — scope, evaluation metrics and privacy explanations.
+- **About JomiGuard** — mission, approach and prototype limitations.
+- **Expanded footer** — workspace/resource navigation, synthetic-data notice and legal/safety disclaimer.
+
+The admin app now includes Overview, Case Catalogue (search/filter/review toggles), Evaluation Centre, Data Governance, and Settings/Notes (including JSON export of synthetic cases). Review state is local to the current browser session and is not persisted to a database.
+
+### Run
+
+From `Frontend/`:
+
+```bash
+npm install
+npm run dev:client
+# second terminal
+npm run dev:admin
+```
+
+From `Backend/`:
+
+```bash
+npm install
+npm run dev
+```
+
+Client default URL: `http://localhost:5173`; admin default URL: `http://localhost:5174`; backend default URL: `http://localhost:4000`.
+
+### Important status note
+
+This UI expansion does not add a trained Bangla OCR model, official land-record integrations, persistent PostgreSQL API storage, or admin authentication/RBAC. The plot map is schematic, not a cadastral map. Do not upload real sensitive documents or claim legal ownership verification. Dependency installation and full builds must be run locally before submission; the build could not be fully verified in the authoring environment.
