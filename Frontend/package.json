@@ -1,0 +1,1 @@
+{"name":"jomiguard-frontend","private":true,"version":"1.0.0","type":"module","workspaces":["apps/*","packages/*"],"scripts":{"dev:client":"npm run dev -w @jomiguard/client","dev:admin":"npm run dev -w @jomiguard/admin","build":"npm run build --workspaces --if-present","typecheck":"npm run typecheck --workspaces --if-present"}}
