@@ -19,13 +19,17 @@ This guide configures the prototype; it cannot prefill private values from your 
 
 ## 3. Run locally
 
-Worker terminal:
+Worker terminal (Cloudflare Worker uses `.dev.vars`, not the root Express `.env`):
 
 ```bash
 cd JomiGuard-Backend-Repo/cloudflare-worker
 npm install
+cp .dev.vars.example .dev.vars
+# Edit .dev.vars with your own Cloudinary and Firebase web API values
 npm run dev
 ```
+
+`.dev.vars` is local-only and ignored by Git. The example file contains placeholders, not working credentials. Production secrets must be configured separately with `wrangler secret put` or Cloudflare Worker settings.
 
 Frontend terminal(s):
 
