@@ -11,3 +11,38 @@
 :root[data-theme="light"] .admin-panel,:root[data-theme="light"] .governance-card,:root[data-theme="light"] .login-card{background:var(--panel);border-color:var(--line);color:var(--text)}:root[data-theme="light"] .admin-table th{background:#edf2f7;color:#536579}:root[data-theme="light"] .admin-table td{color:#536579}:root[data-theme="light"] .admin-table td b{color:#172334}:root[data-theme="light"] .admin-public .site-footer{background:var(--footer)}
 @media(max-width:1100px){.admin-sidebar{width:225px}.admin-main{margin-left:225px;width:calc(100% - 225px)}.admin-content{padding:28px 23px 45px}.admin-grid{grid-template-columns:1fr}.admin-login-layout{gap:35px}.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.admin-login-layout{grid-template-columns:1fr;padding:35px 18px;gap:28px}.admin-login-copy h1{font-size:37px;letter-spacing:-1.4px}.login-card{padding:23px 19px}.admin-public .public-nav{padding:0 15px}.admin-sidebar{transform:translateX(-105%);transition:transform .25s;box-shadow:none;width:265px}.admin-sidebar.open{transform:translateX(0);box-shadow:20px 0 70px #0008}.admin-main{margin-left:0;width:100%}.admin-content{padding:25px 15px 35px}.admin-footer{padding:20px 15px}.admin-footer>span{line-height:1.7}.governance-grid{grid-template-columns:1fr}.table-tools{align-items:stretch}.table-tools .button{justify-content:center}.table-tools .filter-select{flex:1}.setting-row{align-items:flex-start;flex-direction:column;gap:9px}.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.case-row{gap:7px}.case-row .risk-pill{display:none}.admin-grid{grid-template-columns:1fr}.admin-public .site-footer{padding:18px;gap:8px}}
+
+/* Accessibility pass: larger, more comfortable typography */
+body{font-size:16px;line-height:1.65}
+.public-links{font-size:14px;gap:26px}
+.control,.button{font-size:14px;padding:12px 16px}
+.icon-button{width:40px;height:40px}
+.brand-button b,.footer-brand b{font-size:19px}
+.brand-button small{font-size:11px;letter-spacing:1.3px}
+.eyebrow{font-size:12px;letter-spacing:1.4px}
+.admin-login-copy>p{font-size:16px;line-height:1.8}
+.admin-login-points span{font-size:14px}
+.admin-panel h2{font-size:19px}
+.admin-panel>p{font-size:14px;line-height:1.7}
+.case-row>div b{font-size:13px}.case-row>div small{font-size:12px}
+.readiness-row>div b{font-size:13px}.readiness-row>div small{font-size:12px}
+.admin-footer{font-size:12px}.admin-footer button{font-size:12px}
+.admin-table{font-size:12px}.admin-table th{font-size:10px;letter-spacing:.7px}.admin-table th,.admin-table td{padding:15px 14px}
+.admin-table code{font-size:11px}.mini-button{font-size:11px;padding:8px 10px}
+.empty-state{font-size:13px}
+.protocol-row>span{font-size:13px}.protocol-row b{font-size:14px}.protocol-row p{font-size:13px;line-height:1.75}
+.governance-card h3{font-size:17px}.governance-card p{font-size:13px;line-height:1.75}
+.setting-row b{font-size:14px}.setting-row p{font-size:13px;line-height:1.7}.setting-row code{font-size:11px}
+.admin-note{font-size:13px;line-height:1.7}
+.searchbox input,.filter-select select{font-size:14px}
+@media(max-width:760px){
+  body{font-size:15px}
+  .admin-login-copy h1{font-size:clamp(32px,8vw,42px)}
+  .admin-login-copy>p{font-size:15px}
+  .admin-login-points span{font-size:13px}
+  .admin-panel>p{font-size:13px}
+  .case-row>div b{font-size:12px}.case-row>div small{font-size:11px}
+  .admin-table{font-size:12px}.admin-table th{font-size:10px}
+  .protocol-row b{font-size:13px}.protocol-row p{font-size:12px}
+  .governance-card p,.setting-row p{font-size:12px}
+}
