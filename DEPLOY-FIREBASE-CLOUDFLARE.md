@@ -1,115 +1,75 @@
-# JomiGuard BD — production setup and deployment
+# Deployment guide — Cloudflare Pages + Workers, Firebase, Cloudinary
 
-This repo is the frontend monorepo: `apps/client`, `apps/admin`, `packages/shared`. The API repo is separate at `../JomiGuard-Backend-Repo`.
+This guide configures the prototype; it cannot prefill private values from your accounts or deploy on your behalf.
 
-## Important: what is and is not preconfigured
+## 1. Firebase
 
-- Client uses Firebase Authentication (email/password, Google popup, password reset) when Firebase web configuration is supplied.
-- Admin login now checks Firebase Authentication **and** `users/{uid}.role == "admin"`. A localStorage flag is not accepted as authentication.
-- Profile photos upload to Cloudinary through a signed upload signature from the Cloudflare Worker. Firebase Storage is not used for profile pictures.
-- Cloudflare Worker API provides health, synthetic demo cases, a rules-based analysis endpoint and an authenticated Cloudinary signature endpoint.
-- Firestore rules are deny-by-default for land records. Add reviewed collection-specific rules before implementing real persistent land-record CRUD. The current app still uses synthetic demo cases; do not mistake them for persisted official records.
-- You must add your own Firebase and Cloudinary account values. No third-party credentials can be prefilled in a downloadable project.
+1. Create/select a Firebase project and register two web apps if you want separate Client/Admin configs.
+2. Enable Email/Password and Google providers under Authentication.
+3. Add local and production Client/Admin domains to Authentication's authorized domains.
+4. Create Firestore. Review `firebase/firestore.rules` and deploy them from the Firebase console/CLI. The default rules deny all collections except each signed-in user's own profile operations; do not loosen them to public read/write.
+5. Admin access requires a trusted administrator to create/update the user's `users/{uid}` profile with `role: "admin"`. Do not let a user choose their own admin role. Verify the rules and admin sign-in with a test account.
 
-## 1. Requirements
+## 2. Cloudinary
 
-Node.js 20+ (LTS recommended), npm, Git, a Cloudflare account, Firebase project and Cloudinary account.
+1. Create a Cloudinary account and note the Cloud name and API key.
+2. The API secret must be stored only as a Cloudflare Worker secret.
+3. The Worker creates a signature for `jomiguard/profiles/{firebaseUid}` only after Firebase token validation. The browser uploads directly to Cloudinary using the returned signature.
+4. Never expose the API secret in a `VITE_*` variable, browser code or Git repository.
 
-## 2. Firebase
+## 3. Run locally
 
-1. In Firebase Console create/select a project.
-2. Authentication → Sign-in method: enable Email/Password and Google.
-3. Firestore Database → create a database.
-4. Authentication → Settings → Authorized domains: add both deployed Pages domains and any custom domains.
-5. Register a Web app and copy its config.
-6. Create `apps/client/.env.local` and `apps/admin/.env.local` by copying each app's `.env.example`. Set `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, and `VITE_API_URL`.
-7. Publish Firestore rules: from this directory run `npx firebase-tools deploy --only firestore:rules --project YOUR_FIREBASE_PROJECT_ID` after installing Firebase CLI (`npm i -g firebase-tools`) and `firebase login`.
-8. Create the first admin using Firebase Authentication, then create `users/{UID}` in Firestore with fields `{ "role": "admin", "email": "admin@example.com" }` from the Firebase Console. Do not allow public signup to set their own role.
+Worker terminal:
 
-## 3. Cloudinary
+```bash
+cd JomiGuard-Backend-Repo/cloudflare-worker
+npm install
+npm run dev
+```
 
-1. Create an account and copy Cloud name, API Key, API Secret.
-2. The Worker signs authenticated profile uploads. The client uploads directly to Cloudinary after it gets a signature from the Worker. Only profile folder `jomiguard/profiles/{uid}` is permitted by this endpoint.
-3. Keep API Secret only in Cloudflare Worker secrets; never add it to `VITE_*` variables or commit it.
-
-## 4. Run the frontend locally
+Frontend terminal(s):
 
 ```bash
 cd JomiGuard-Frontend-Repo
 npm install
 cp apps/client/.env.example apps/client/.env.local
 cp apps/admin/.env.example apps/admin/.env.local
-# edit both .env.local files with your own Firebase config and API URL
-npm run dev:client
-# another terminal
-npm run dev:admin
 ```
 
-Client: http://localhost:5173, Admin: http://localhost:5174.
+Set `VITE_API_URL=http://localhost:8787/api` in both env files for the Wrangler local server. Set the Firebase web config values for sign-in tests. Start Client with `npm run dev:client` and Admin with `npm run dev:admin` in separate terminals.
 
-## 5. Deploy the API Worker
+## 4. Deploy Worker
+
+1. In `cloudflare-worker/wrangler.toml`, set `CORS_ORIGINS` to the exact origins for the deployed Client and Admin. Example: `https://your-client.pages.dev,https://your-admin.pages.dev`.
+2. Set vars `CLOUDINARY_CLOUD_NAME` and `CLOUDINARY_API_KEY` in Wrangler config or Worker Settings.
+3. From `JomiGuard-Backend-Repo/cloudflare-worker`, run:
 
 ```bash
-cd JomiGuard-Backend-Repo/cloudflare-worker
-npm install
 npx wrangler login
 npx wrangler secret put CLOUDINARY_API_SECRET
 npx wrangler secret put FIREBASE_WEB_API_KEY
+npx wrangler deploy
 ```
 
-Set these non-secret Worker variables in Cloudflare dashboard → Worker → Settings → Variables:
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CORS_ORIGINS` = exact comma-separated production client/admin origins, e.g. `https://YOUR-CLIENT.pages.dev,https://YOUR-ADMIN.pages.dev`
-- `APP_ENV` = `production`
+4. Verify `https://YOUR-WORKER.workers.dev/api/health` and `/api/transactions/scenarios`.
 
-Then deploy:
+## 5. Deploy Client and Admin as separate Pages projects
 
-```bash
-npm run deploy
-```
+Connect the frontend repository to Cloudflare Pages twice.
 
-Copy the deployed `https://...workers.dev` URL into both frontend `.env.local` files as `VITE_API_URL=https://YOUR-WORKER.workers.dev/api` (note the `/api` suffix). Rebuild/redeploy both Pages projects after changing the variable.
+- Client project root directory: `JomiGuard-Frontend-Repo`; build command: `npm run build -w @jomiguard/client`; output directory: `apps/client/dist`.
+- Admin project root directory: `JomiGuard-Frontend-Repo`; build command: `npm run build -w @jomiguard/admin`; output directory: `apps/admin/dist`.
 
-Test `https://YOUR-WORKER.workers.dev/api/health` and `/api/cases` in a browser.
+If the Pages build environment does not install npm workspaces correctly with that root/output configuration, use the repository root and the same workspace commands; verify the build log rather than guessing. Set the same `VITE_FIREBASE_*` values in both Pages projects and `VITE_API_URL=https://YOUR-WORKER.workers.dev/api`. For Admin, set `VITE_CLIENT_URL=https://YOUR-CLIENT.pages.dev`.
 
-## 6. Deploy the two Pages projects
+After first deploy, add the Pages domains to Firebase Authentication authorized domains. Update Worker `CORS_ORIGINS` with the final origins and redeploy. Rebuild/redeploy the Pages apps after changing any `VITE_*` variables.
 
-Push `JomiGuard-Frontend-Repo` to its own GitHub repository. In Cloudflare Dashboard → Workers & Pages → Create → Pages → Connect to Git:
+## 6. Production checks
 
-**Client project**
-- Root directory: `/` (repository root)
-- Build command: `npm run build --workspace=@jomiguard/client`
-- Build output directory: `apps/client/dist`
-- Environment variables: all `VITE_FIREBASE_*` values and `VITE_API_URL`.
-
-**Admin project**
-- Same GitHub repository
-- Root directory: `/`
-- Build command: `npm run build --workspace=@jomiguard/admin`
-- Build output directory: `apps/admin/dist`
-- Environment variables: same Firebase values and `VITE_API_URL`.
-
-Use each app's `.env.example` names in Cloudflare Pages settings. `VITE_*` values are public build-time configuration, not secrets. Add deployed domains to Firebase Authorized domains and set the Worker `CORS_ORIGINS` to the exact origins.
-
-## 7. Backend local development
-
-The existing Express backend is retained for local development and tests:
-
-```bash
-cd JomiGuard-Backend-Repo
-npm install
-cp .env.example .env
-npm run dev
-```
-
-The Cloudflare deployable implementation is in `cloudflare-worker/`; Express cannot be deployed directly as a Worker without adaptation.
-
-## 8. Security / release checklist
-
-- Never commit `.env`, `.env.local`, `.dev.vars`, API secrets or service-account JSON.
-- Do not enable broad Firestore read/write rules in production.
-- Admin role must be assigned manually by a trusted project owner. The admin UI checks the role document; restrict who can create/update role documents.
-- Configure Firebase App Check and rate limiting before public launch.
-- The current records and risk examples are synthetic. No government land registry API is connected, OCR is not integrated, and this tool does not prove legal ownership.
-- Test sign-up, sign-in, password reset, Google sign-in, admin role rejection, image upload, CORS and mobile layout on the deployed URLs.
+- Confirm health, scenario list, baseline screen and double-sale screen work in the deployed browser.
+- Confirm Admin rejects a regular user and accepts only a trusted admin role.
+- Confirm Firebase rules do not allow public reads/writes and no user can self-assign admin.
+- Confirm image upload fails for unauthenticated users and API secrets are not present in browser assets.
+- Inspect Network/Console for CORS, 404 and Firebase domain errors.
+- Do not use real land records or personal data in this hackathon prototype.
+- Keep this as a prototype until all security and functionality checks pass.

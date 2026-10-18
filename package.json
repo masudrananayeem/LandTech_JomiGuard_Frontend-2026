@@ -1,1 +1,20 @@
-{"name":"jomiguard-frontend","private":true,"version":"1.0.0","type":"module","workspaces":["apps/*","packages/*"],"scripts":{"dev:client":"npm run dev -w @jomiguard/client","dev:admin":"npm run dev -w @jomiguard/admin","build":"npm run build --workspaces --if-present","typecheck":"npm run typecheck --workspaces --if-present"}}
+{
+  "name": "jomiguard-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:client": "npm run dev -w @jomiguard/client",
+    "dev:admin": "npm run dev -w @jomiguard/admin",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build:client": "npm run build -w @jomiguard/client",
+    "build:admin": "npm run build -w @jomiguard/admin",
+    "typecheck:client": "npm run typecheck -w @jomiguard/client",
+    "typecheck:admin": "npm run typecheck -w @jomiguard/admin"
+  }
+}

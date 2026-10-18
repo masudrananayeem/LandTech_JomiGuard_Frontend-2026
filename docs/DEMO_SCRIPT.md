@@ -1,21 +1,21 @@
-# 3-minute demo script
+# 3-minute demo script (recorded runtime must be <= 3:00)
 
-**0:00–0:20 — Problem**: “A buyer may receive a deed, khatian and mutation information. Manually comparing names, plot numbers, area and dates is error-prone. JomiGuard flags inconsistencies; it does not decide legal ownership.”
+**0:00–0:20 — Problem and scope**  
+Introduce JomiGuard BD and state the selected rulebook problem: P3, Catch Fraud & Double-Selling. Emphasize synthetic data only.
 
-**0:20–0:45 — Product**: Open client and explain the three synthetic scenarios. State clearly that all records are fictional.
+**0:20–0:45 — Explainable workflow**  
+Open Transaction Screening and select the synthetic scenario catalogue.
 
-**0:45–1:30 — High-risk case**: Select `Conflicting owner and plot details`, click Run cross-check. Show owner mismatch, dag mismatch and area mismatch. Explain that each finding includes evidence and a recommended human follow-up.
+**0:45–1:35 — Show two contrasting cases**  
+Run the clear baseline, then run the possible double-sale or duplicate-deed case. Show rule-by-rule results and explain why a FAIL is a review signal, not proof of fraud.
 
-**1:30–1:55 — Low-risk case**: Select `Consistent sample record`; show no inconsistency in supplied fields. Emphasize that a clean result is not proof of legal validity.
+**1:35–2:10 — Missing evidence and recommended next steps**  
+Run the incomplete-evidence scenario and show warnings, guidance and the limitations notice.
 
-**1:55–2:20 — Upload readiness**: Select a sample image/PDF and validate upload. Be honest that OCR is not configured in this starter; explain the plan to connect licensed Bangla OCR and measure field accuracy/CER/WER on held-out labelled images.
+**2:10–2:35 — Report export and admin view**  
+Export the JSON report and show the synthetic-data governance / case catalogue page.
 
-**2:20–2:45 — Admin**: Open admin app; show case catalogue and synthetic rule-engine check. Explicitly distinguish it from OCR model accuracy.
+**2:35–3:00 — Architecture and limitations**  
+Briefly show Client/API/Admin architecture. State that the prototype uses no real land records, no government APIs, and makes no unmeasured accuracy claims.
 
-**2:45–3:00 — Impact**: “JomiGuard turns multiple supplied records into explainable checks and a verification checklist. Authorized official verification and legal review remain essential.”
-
-## Do not claim
-- Government API connection
-- Official ownership verification or fraud detection
-- OCR accuracy / 90%+ accuracy (not measured here)
-- That synthetic test results generalize to real documents
+Before recording: rehearse and time the actual app. Remove any personal or secret values from the screen. Do not narrate features that do not work in the recorded build.
